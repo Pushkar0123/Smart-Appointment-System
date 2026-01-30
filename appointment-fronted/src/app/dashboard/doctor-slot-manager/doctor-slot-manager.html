@@ -1,0 +1,26 @@
+<h3>Manage Slots</h3>
+
+<div class="create-box">
+  <label>Start Time</label>
+  <input type="datetime-local" [(ngModel)]="startTime">
+
+  <label>End Time</label>
+  <input type="datetime-local" [(ngModel)]="endTime">
+
+  <button (click)="createSlot()">Create Slot</button>
+</div>
+
+<hr>
+
+<div class="slot-card" *ngFor="let slot of slots">
+  <p><b>Date:</b> {{ slot.startTime | date:'mediumDate' }}</p>
+  <p>
+    <b>Time:</b>
+    {{ slot.startTime | date:'shortTime' }} -
+    {{ slot.endTime | date:'shortTime' }}
+  </p>
+
+  <span>{{ slot.status }}</span>
+
+  <button class="danger" (click)="deleteSlot(slot.id)">Delete</button>
+</div>

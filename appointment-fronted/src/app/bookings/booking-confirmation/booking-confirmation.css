@@ -1,0 +1,63 @@
+.confirmation-container {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.details {
+  margin: 15px 0;
+}
+
+button {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+  
+button:hover {
+  background-color: #1565c0;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.success-card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  width: 400px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.1);
+}
+
+.checkmark {
+  font-size: 48px;
+  color: #198754;
+  margin-bottom: 10px;
+}
+
+.details {
+  margin: 20px 0;
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #0d6efd;
+  color: white;
+}

@@ -1,0 +1,43 @@
+<div class="container">
+
+  <h2>Available Slots</h2>
+
+  <p *ngIf="loading">Loading slots...</p>
+
+  
+  <p *ngIf="!loading && slots.length === 0">
+    No slots available
+  </p>
+
+  <div class="slot-container" *ngIf="!loading && slots.length > 0">
+
+    <div class="slot-card" *ngFor="let slot of slots">
+
+      <p><b>Date:</b> {{ slot.startTime | date:'mediumDate' }}</p>
+      <p>
+        <b>Time:</b>
+        {{ slot.startTime | date:'shortTime' }} -
+        {{ slot.endTime | date:'shortTime' }}
+      </p>
+
+      <span class="status" [ngClass]="getStatusClass(slot.status)">
+        {{ slot.status }}
+      </span>
+
+      <br>
+
+      <button
+        *ngIf="slot.status === 'Available'"
+        class="success"
+        (click)="book(slot.id)">
+        Book Now
+      </button>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+    

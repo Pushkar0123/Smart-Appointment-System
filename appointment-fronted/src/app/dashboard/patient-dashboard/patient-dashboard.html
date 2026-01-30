@@ -1,0 +1,78 @@
+<div class="patient-dashboard">
+
+  <h1 class="welcome">Welcome Patient 👋</h1>
+  <div class="patient-page">
+  <div *ngIf="slots$ | async as slots">
+
+  <!-- EMPTY STATE -->
+  <div *ngIf="slots.length === 0" class="empty-state">
+    <img src="assets/images/doctor1-icon.png" alt="No slots" class="empty-image"/>
+    <h3>No Available Slots</h3>
+    <p>Please check again later.</p>
+  </div>
+
+  <!-- SLOT GRID -->
+  <div class="slot-container" *ngIf="slots.length > 0">
+
+    <div
+      class="slot-card"
+      *ngFor="let slot of slots; trackBy: trackById">
+
+      <!-- Header with icon -->
+      <div class="slot-header">
+          <div class="icon-wrapper">
+              <!-- <img
+                src="assets/images/patient1.png"
+                class="patient1-icon"
+              /> -->
+              <!-- <div style="padding:20px; background:yellow;">
+                <img
+                  src="assets/images/patient1.png"
+                  style="width:120px;height:120px;display:block;"
+                />
+              </div> -->
+              <div class="patient-icon"></div>
+          </div>
+
+          <span class="slot-date">
+            {{ slot.startTime | date:'fullDate' }}
+          </span>
+      </div>
+
+
+      <!-- Time -->
+      <div class="slot-time">
+        ⏰ {{ slot.startTime | date:'shortTime' }}
+        -
+        {{ slot.endTime | date:'shortTime' }}
+      </div>
+
+      <!-- Status -->
+      <div
+        class="status-chip"
+        [ngClass]="{
+          'available': slot.status === 'Available',
+          'booked': slot.status !== 'Available'
+        }">
+
+        <span *ngIf="slot.status === 'Available'">🟢 Available</span>
+        <span *ngIf="slot.status !== 'Available'">🔴 Booked</span>
+      </div>
+
+      <!-- Action -->
+      <button
+        class="book-btn"
+        [disabled]="slot.status !== 'Available'"
+        (click)="book(slot.id)">
+        <span class="btn-icon">📅</span>
+        Book Appointment
+      </button>
+
+    </div>
+
+  </div>
+</div>
+</div>
+  
+
+</div>

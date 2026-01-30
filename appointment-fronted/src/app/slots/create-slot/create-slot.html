@@ -1,0 +1,26 @@
+<div class="card">
+
+  <h3>Create New Slot</h3>
+
+  <label>Start Time</label>
+  <input
+    type="datetime-local"
+    [(ngModel)]="startTime" />
+
+  <label>End Time</label>
+  <input
+    type="datetime-local"
+    [(ngModel)]="endTime" />
+
+  <button
+    (click)="createSlot()"
+    [disabled]="loading">
+    {{ loading ? 'Creating...' : 'Create Slot' }}
+  </button>
+
+  <p class="error" *ngIf="error">
+    {{ error }}
+  </p>
+
+</div>
+          

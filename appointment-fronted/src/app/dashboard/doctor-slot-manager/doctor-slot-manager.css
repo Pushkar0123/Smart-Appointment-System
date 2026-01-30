@@ -1,0 +1,42 @@
+.create-box {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.1);
+  max-width: 400px;
+}
+
+.create-box input {
+  width: 100%;
+  padding: 6px;
+  margin: 8px 0;
+}
+
+hr {
+  margin: 20px 0;
+}
+
+button {
+  padding: 6px 12px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+.slot-card {
+  background: white;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,.1);
+}
+
+.danger {
+  background: #d9534f;
+  color: white;
+  border: none;
+}
+.success {
+  background: #5cb85c;
+  color: white;
+  border: none;
+}

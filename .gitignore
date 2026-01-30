@@ -1,0 +1,18 @@
+# Visual Studio
+.vs/
+
+# .NET
+**/bin/
+**/obj/
+
+# Angular
+appointment-fronted/node_modules/
+appointment-fronted/dist/
+appointment-fronted/.angular/
+
+# Environment files
+**/appsettings.Development.json
+
+# OS files
+.DS_Store
+Thumbs.db

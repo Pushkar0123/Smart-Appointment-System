@@ -1,0 +1,69 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1>Doctor Dashboard</h1>
+  </header>
+
+    <button class="create-btn" (click)="toggleCreate()">
+      + Create Slot
+    </button>
+
+    <app-create-slot
+      *ngIf="showCreate"
+      (slotCreated)="onSlotCreated()">
+    </app-create-slot>
+
+    <div *ngIf="loading">Loading slots...</div>
+
+    <div *ngIf="!loading && slots.length === 0" class="empty">
+      No slots available. Create one above!
+    </div>
+
+    <div class="slot-container" *ngIf="!loading && slots.length > 0">
+      <div class="slot-card" *ngFor="let slot of slots">
+
+        <p><b>Date:</b> {{ slot.startTime | date:'mediumDate' }}</p>
+        <p>
+          <b>Time:</b>
+          {{ slot.startTime | date:'shortTime' }} -
+          {{ slot.endTime | date:'shortTime' }}
+        </p>
+
+        <span class="status" [ngClass]="getStatusClass(slot.status)">
+          {{ slot.status }}
+        </span>
+
+      <div class="actions">
+
+        <!-- Available slot delete -->
+        <button
+          *ngIf="slot.status === 'Available' || slot.status === 0"
+          class="delete-btn"
+          (click)="deleteSlot(slot.id)">
+          Delete
+        </button>
+
+        <!-- Expired slot delete -->
+        <button
+          *ngIf="slot.status === 'Expired' && !slot.isBooked"
+          class="delete-btn expired-delete"
+          (click)="deleteExpiredSlot(slot.id)">
+          Delete
+        </button>
+
+        <span
+          *ngIf="slot.status === 'Expired' && slot.isBooked"
+          class="cannot-delete">
+          Booked – cannot delete
+        </span>
+
+
+      </div>
+
+      
+<!-- <p style="color:red">DEBUG STATUS: {{ slot.status }}</p> -->
+<!-- <p style="color:red; font-size:12px">
+  DEBUG → status value: {{ slot.status }} ({{ typeof slot.status }})
+</p> -->
+      </div>
+    </div>
+</div>
