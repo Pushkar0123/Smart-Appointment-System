@@ -19,6 +19,32 @@ namespace AppointmentAPI.Controllers
             _context = context;
         }
 
+        // Public - Get All Slots (for testing / demo)
+        // GET: api/slots
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetAllSlotsPublic()
+        {
+            var slots = await _context.Slots
+                .Include(s => s.Booking)
+                .OrderBy(s => s.StartTime)
+                .Select(s => new
+                {
+                    s.Id,
+                    s.StartTime,
+                    s.EndTime,
+                    status =
+                        s.EndTime < DateTime.Now
+                            ? "Expired"
+                            : s.Booking != null
+                                ? "Booked"
+                                : "Available"
+                })
+                .ToListAsync();
+
+            return Ok(slots);
+        }
+
         // ===================== DOCTOR =====================
 
         // Doctor - Get All Slots
