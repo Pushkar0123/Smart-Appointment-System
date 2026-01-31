@@ -34,7 +34,7 @@ namespace AppointmentAPI.Controllers
                     s.StartTime,
                     s.EndTime,
                     status =
-                        s.EndTime < DateTime.Now
+                        s.EndTime < DateTimeOffset.UtcNow
                             ? "Expired"
                             : s.Booking != null
                                 ? "Booked"
@@ -62,7 +62,7 @@ namespace AppointmentAPI.Controllers
                     s.StartTime,
                     s.EndTime,
                     status =
-                        s.EndTime < DateTime.Now
+                        s.EndTime < DateTimeOffset.UtcNow
                             ? "Expired"
                             : s.Booking != null
                                 ? "Booked"
@@ -147,7 +147,7 @@ namespace AppointmentAPI.Controllers
         {
             var query = _context.Slots
                 .Include(s => s.Booking)
-                .Where(s => s.EndTime > DateTime.Now && s.Booking == null);
+                .Where(s => s.EndTime > DateTimeOffset.UtcNow && s.Booking == null);
 
             var totalRecords = await query.CountAsync();
 
@@ -202,7 +202,7 @@ namespace AppointmentAPI.Controllers
                 return NotFound("Slot not found");
 
             // Only allow delete if expired
-            if (slot.EndTime >= DateTime.Now)
+            if (slot.EndTime >= DateTimeOffset.UtcNow)
                 return BadRequest("Slot is not expired");
 
             // // Safety: do not delete booked slots

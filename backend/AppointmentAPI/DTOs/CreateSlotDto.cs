@@ -5,9 +5,9 @@ namespace AppointmentAPI.DTOs
     public class CreateSlotDto
     {
         [Required]
-        public DateTime StartTime { get; set; }
+        public DateTimeOffset StartTime { get; set; }
 
         [Required]
-        public DateTime EndTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
     }
 }
