@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using AppointmentAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using AppointmentAPI.Middleware;
 using System.Text;
+
+//Put in appsetting.json
+// "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=AppointmentDB;Trusted_Connection=True;TrustServerCertificate=True;"
 
 //MVC
 
@@ -49,32 +52,73 @@ builder.Services.AddEndpointsApiExplorer();
 //     });
 // });
 
+
+// // BUilding the swagger Configuration  for Net 10 --------------------------
+
+// builder.Services.AddSwaggerGen(c =>
+// {
+//     const string schemeId = "Bearer";
+
+//     c.AddSecurityDefinition(schemeId, new OpenApiSecurityScheme
+//     {
+//         Name = "Authorization",
+//         Type = SecuritySchemeType.Http,
+//         Scheme = "bearer", 
+//         BearerFormat = "JWT",
+//         In = ParameterLocation.Header,
+//         Description = "Enter 'Bearer' [space] and then your valid token."
+//     });
+
+//     // .NET 10 version using the "doc" delegate and explicit dictionary assignment
+//     c.AddSecurityRequirement(doc => 
+//     {
+//         var requirement = new OpenApiSecurityRequirement();
+//         var scheme = new OpenApiSecuritySchemeReference(schemeId, doc);
+        
+//         // Use the bracket [ ] syntax instead of the { } initializer
+//         requirement[scheme] = new List<string>(); 
+        
+//         return requirement;
+//     });
+// });
+
+//-----------------------------------------------------------------
+
+// ADD THIS INSTEAD (NET 8 SAFE)
 builder.Services.AddSwaggerGen(c =>
 {
-    const string schemeId = "Bearer";
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Appointment API",
+        Version = "v1"
+    });
 
-    c.AddSecurityDefinition(schemeId, new OpenApiSecurityScheme
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
-        Scheme = "bearer", 
+        Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter 'Bearer' [space] and then your valid token."
+        Description = "Enter: Bearer {your JWT token}"
     });
 
-    // .NET 10 version using the "doc" delegate and explicit dictionary assignment
-    c.AddSecurityRequirement(doc => 
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        var requirement = new OpenApiSecurityRequirement();
-        var scheme = new OpenApiSecuritySchemeReference(schemeId, doc);
-        
-        // Use the bracket [ ] syntax instead of the { } initializer
-        requirement[scheme] = new List<string>(); 
-        
-        return requirement;
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
     });
 });
+
 
 
 builder.Services.AddAuthentication(options =>
@@ -98,11 +142,73 @@ builder.Services.AddAuthentication(options =>
 
 
 
-// Database registration
+// // Local Database registration for Azue database studio and server => LAPTOP-MHT22HVF\SQLEXPRESS
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseSqlServer(
+//         builder.Configuration.GetConnectionString("DefaultConnection")
+//     ));
+
+// ================= DATABASE CONFIG (Railway PostgreSQL + Local Fallback) =================
+
+var rawDatabaseUrl = builder.Configuration["DATABASE_URL"];
+string connectionString;
+
+if (!string.IsNullOrEmpty(rawDatabaseUrl))
+{
+    // Railway PostgreSQL
+    var uri = new Uri(rawDatabaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+
+    connectionString =
+        $"Host={uri.Host};" +
+        $"Port={uri.Port};" +
+        $"Database={uri.AbsolutePath.TrimStart('/')};" +
+        $"Username={userInfo[0]};" +
+        $"Password={userInfo[1]};" +
+        $"Ssl Mode=Require;" +
+        $"Trust Server Certificate=true";
+}
+else
+{
+    // Local development (optional)
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+}
+
+// uisng Nptsql
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    ));
+    options.UseNpgsql(connectionString)); 
+
+
+// var rawDatabaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+// // if (string.IsNullOrWhiteSpace(rawDatabaseUrl))
+// // {
+// //     throw new Exception("DATABASE_URL environment variable is not set.");
+// // }
+
+// if (string.IsNullOrWhiteSpace(rawDatabaseUrl))
+// {
+//     Console.WriteLine("DATABASE_URL not found. App will fail at runtime if DB is required.");
+// }
+
+
+// var uri = new Uri(rawDatabaseUrl);
+// var userInfo = uri.UserInfo.Split(':');
+
+// var connectionString =
+//     $"Host={uri.Host};" +
+//     $"Port={uri.Port};" +
+//     $"Database={uri.AbsolutePath.TrimStart('/')};" +
+//     $"Username={userInfo[0]};" +
+//     $"Password={userInfo[1]};" +
+//     $"Ssl Mode=Require;" +
+//     $"Trust Server Certificate=true";
+
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseNpgsql(connectionString));
+
+
+// -----------------------------------------------------------------------------------
 
 
 builder.Services.AddCors(options =>
@@ -111,7 +217,8 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("http://localhost:4200")
+                // .WithOrigins("http://localhost:4200")  //This will Break netlify deployment
+                .AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
