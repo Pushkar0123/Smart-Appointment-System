@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using AppointmentAPI.Middleware;
 using System.Text;
 
-//Put in appsetting.json
+//Put in appsetting.json for local db
 // "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=AppointmentDB;Trusted_Connection=True;TrustServerCertificate=True;"
 
 //MVC
@@ -174,9 +174,29 @@ else
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 }
 
-// uisng Nptsql
+// uisng Npgsql for Railway
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseNpgsql(connectionString)); 
+
+
+// BACKEND FOR AZURE SQL SERVER PROVIDER
+
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseSqlServer(
+//         builder.Configuration.GetConnectionString("DefaultConnection")
+//     ));
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString)); 
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sql => sql.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null
+        )
+    ));
+
+
 
 
 // var rawDatabaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
@@ -228,6 +248,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// It work locally for Swagger
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
 // {
@@ -274,6 +295,10 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+
+//To confirm app is running at all, add this temporarily:
+app.MapGet("/", () => "API is running on Azure");
+
 
 app.Run();
 
